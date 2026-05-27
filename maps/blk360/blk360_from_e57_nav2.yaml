@@ -1,0 +1,10 @@
+image: blk360_from_e57_nav2.pgm
+mode: trinary
+resolution: 0.05
+origin:
+- -27.57402139733791
+- -40.21920217220249
+- 0.0
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25
