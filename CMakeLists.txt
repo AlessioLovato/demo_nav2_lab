@@ -8,15 +8,18 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+find_package(ament_cmake REQUIRED)
 find_package(perception_utils_ros2 REQUIRED)
-find_package(concert_description REQUIRED)
 find_package(concert_mapping REQUIRED)
 find_package(concert_navigation REQUIRED)
 
 install(
   DIRECTORY mesh 
+            urdf
             maps
+            config
             launch
+            worlds
   DESTINATION share/${PROJECT_NAME}
 )
 
