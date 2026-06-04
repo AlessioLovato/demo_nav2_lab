@@ -44,6 +44,12 @@ def generate_launch_description():
         description='Whether to run RTAB-Map in localization mode (no new map creation)'
     )
 
+    pcd_file_arg = DeclareLaunchArgument(
+        'pcd_file',
+        default_value="maps/pointclouds_",
+        description='Prefix for the saved PCD file when the node shuts down'
+    )
+
 
     ##################################################################
     #######  lAUNCH FILES  #######
@@ -70,6 +76,7 @@ def generate_launch_description():
         launch_arguments={'use_sim_time': LaunchConfiguration('use_sim_time')}.items()
     )
 
+    # 4. Odometry node using ICP scan matching
     icp_odometry_node = Node(
         package='rtabmap_odom',
         executable='icp_odometry',
@@ -105,6 +112,7 @@ def generate_launch_description():
         ]
     )
 
+    # 5. RTAB-Map SLAM/localization node
     rtabmap_node_slam = Node(
         condition=UnlessCondition(LaunchConfiguration('localization')),
         package='rtabmap_slam',
@@ -190,6 +198,7 @@ def generate_launch_description():
         ]
     )
 
+    # 6. RTAB-Map visualization node
     rtabmap_viz_node = Node(
         package='rtabmap_viz',
         executable='rtabmap_viz',
@@ -208,19 +217,39 @@ def generate_launch_description():
         ],
         condition=IfCondition(LaunchConfiguration("rtabmap_viz")),
     )
-    
 
-    
+    # 7. Map saving node
+    pcd_exporting = Node(
+        condition=IfCondition(LaunchConfiguration('localization')),
+        package='perception_utils_ros2',  # Replace with the actual package name containing pointcloud_to_pcd
+        executable='pointcloud_to_pcd_node',  # Name of the executable
+        name='pointcloud_to_pcd',
+        parameters=[{
+            'prefix': LaunchConfiguration("pcd_file"),        # Set the PCD file name prefix
+            'binary': False,           # Save the PCD file in ASCII format
+            'compressed': False,       # Disable compression
+            'rgb': False,              # Set RGB support to false if the point cloud doesn't contain color
+            'save_timer_sec': 0.0,
+            'save_on_shutdown': True
+        }],
+        remappings=[
+            ('input', '/cloud_map')       # Remap the input point cloud topic to '/cloud_in'
+        ],
+        output='screen'
+    )
+
 
     return LaunchDescription([
         use_sim_time_arg,
         deskewing_arg,
         rtabmap_viz_node_arg,
         localization_arg,
+        pcd_file_arg,
         odom_launch,
         merge_pointcloud_launch,
         icp_odometry_node,
         rtabmap_node,
         rtabmap_node_slam,
-        rtabmap_viz_node
+        rtabmap_viz_node,
+        pcd_exporting
     ])
