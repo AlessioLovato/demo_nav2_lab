@@ -220,7 +220,6 @@ def generate_launch_description():
 
     # 7. Map saving node
     pcd_exporting = Node(
-        condition=IfCondition(LaunchConfiguration('localization')),
         package='perception_utils_ros2',  # Replace with the actual package name containing pointcloud_to_pcd
         executable='pointcloud_to_pcd_node',  # Name of the executable
         name='pointcloud_to_pcd',

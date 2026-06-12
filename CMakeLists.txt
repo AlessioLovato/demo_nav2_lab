@@ -17,7 +17,7 @@ install(
   DIRECTORY mesh 
             urdf
             maps
-            config
+            # config
             launch
             worlds
   DESTINATION share/${PROJECT_NAME}
