@@ -10,7 +10,6 @@ from launch.conditions import IfCondition, UnlessCondition
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-from launch.conditions import IfCondition
 
 from launch_ros.actions import Node
 
@@ -83,7 +82,7 @@ def generate_launch_description():
         name='icp_odometry',
         output='screen',
         parameters=[{
-            'frame_id': 'base_link_projected',
+            'frame_id': 'base_link',
             'odom_frame_id': 'odom_icp',
             'guess_frame_id': 'odom',
             'wait_for_transform': 0.2,
@@ -120,7 +119,7 @@ def generate_launch_description():
         name='rtabmap',
         output='screen',
         parameters=[{
-            'frame_id': 'base_link_projected',
+            'frame_id': 'base_link',
             'subscribe_depth': False,
             'subscribe_rgb': False,
             'subscribe_scan_cloud': True,
@@ -162,7 +161,7 @@ def generate_launch_description():
         name='rtabmap',
         output='screen',
         parameters=[{
-            'frame_id': 'base_link_projected',
+            'frame_id': 'base_link',
             'subscribe_depth': False,
             'subscribe_rgb': False,
             'subscribe_scan_cloud': True,
@@ -205,7 +204,7 @@ def generate_launch_description():
         name='rtabmap_viz',
         output='screen',
         parameters=[{
-            'frame_id': 'base_link_projected',
+            'frame_id': 'base_link',
             'odom_frame_id': 'odom',
             'subscribe_odom_info': True,
             'subscribe_scan_cloud': True,

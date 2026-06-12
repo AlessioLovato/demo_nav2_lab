@@ -19,6 +19,7 @@ install(
             maps
             # config
             launch
+            rviz
             worlds
   DESTINATION share/${PROJECT_NAME}
 )
