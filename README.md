@@ -2,7 +2,7 @@
 
 To keep the systems separated, the **CONCERT onboard sub-network** uses `ROS_DOMAIN_ID=100`, while **PILOT** uses `ROS_DOMAIN_ID=77`.
 
-This setup is required because automatic discovery did not work reliably.
+This setup is required because automatic discovery range do not work reliably.
 
 ---
 
@@ -86,29 +86,31 @@ ros2 launch concert_config velodyne-VLP16_back.launch.py
 
 ## 4. Vision PC
 
-On the **Vision PC**, launch the front VLP LiDAR and the Zenoh DDS bridge.
+On the **Vision PC** (ip 10.24.10.101), launch the front VLP LiDAR and the Zenoh DDS bridge.
 
-### Front Velodyne VLP-16 LiDAR
+### Terminal 1 — Front Velodyne VLP-16 LiDAR
 
 ```bash
 ros2 launch concert_config velodyne-VLP16_front.launch.py
 ```
 
-### Zenoh DDS Bridge
+### Terminal 2 — Zenoh DDS Bridge
 
 ```bash
-zenoh_dds2_bridge
+zenoh-bridge-ros2dds
 ```
 
 ---
 
 ## 5. Pilot
 
-On **PILOT**, start the Zenoh DDS bridge and point it to the Pilot IP.
+On **PILOT** (IP address: `10.24.10.77`), start the Zenoh DDS bridge and point it to the Vision IP.
 
 ```bash
-zenoh_dds2_bridge <ip_pilot>
+zenoh-bridge-ros2dds -e tcp/10.24.10.101:7447
 ```
+
+Then load whatever visual interface you need.
 
 ---
 
@@ -119,7 +121,6 @@ On **Vision**, make sure the repositories are on the following branches:
 | Repository             | Branch           |
 | ---------------------- | ---------------- |
 | `concert_localization` | `master`         |
-| `concert_navigation`   | `test_alelovato` |
 
 Then run:
 
@@ -132,30 +133,32 @@ ros2 launch concert_localization rtabmap.launch.py
 ## 7. Localization
 
 On **Vision**, make sure `concert_localization` is on branch `master`.
+**For this part a PCD map is required. Seen note below.**
 
 Then run:
 
 ```bash
-ros2 launch concert_localization localization.launch.py map_file:=/path/to/map
+ros2 launch concert_localization hdl_localization.launch.py map_file:=/path/to/map.pcd
 ```
 
 > **Note:**
-> If you are using `rtabmap.launch.py` to collect the PCD file, the generated `.pcd` file is usually saved under:
+> If you are using `rtabmap.launch.py` to collect the PCD file launched from `forest_ws` folder, the generated `.pcd` file is usually saved under:
 >
 > ```text
-> current_dir/maps
+> /home/user/data/forest_ws/maps
 > ```
 
 ---
 
 ## 8. Navigation
 
-On **Vision**, make sure `concert_navigation` is on branch `test_alelovato`.
+On **Vision**, make sure `concert_navigation` is on branch `test_alelovato`.<br>
+**For this part a Nav2 style map is required. Seen note below.**
 
 Then run:
 
 ```bash
-ros2 launch concert_localization navigation.launch.py map_file:=/path/to/map.yaml
+ros2 launch concert_navigation navigation.launch.py map_file:=/path/to/map.yaml
 ```
 
 > **Note:**
