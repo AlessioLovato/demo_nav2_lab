@@ -99,4 +99,4 @@ Go back to [`README.md`](README.md) to bring up localization and navigation.
 
 ## 4. Demo
 
-With the drilling plugin and navigation both up, start the demo: send the robot to autonomously navigate to the drilling point, and once it arrives, start drilling on the wall.
+With the drilling plugin up, now you can bring up all the navigation stack as explained in [`README.md`](README.md).
