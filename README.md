@@ -5,7 +5,7 @@ To keep the systems separated, the **CONCERT onboard sub-network** uses `ROS_DOM
 This setup is required because automatic discovery range do not work reliably.
 
 > [!CAUTION]
-> **Full demo order:** this README covers the **ROS2** navigation pipeline. The demo can also have a **ROS1** drilling part, documented separately in [`DRILLING_DEMO.md`](DRILLING_DEMO.md). Those operation **MUST** be performed before starting the navigation stack.
+> **Full demo order:** this README covers the **ROS2** navigation pipeline. The demo can also have a **ROS1** drilling part, documented separately in [`DRILLING_DEMO.md`](DRILLING_DEMO.md). Those operation **MUST** be performed before starting any of the step described below.
 
 
 ---
@@ -188,4 +188,10 @@ ros2 launch concert_navigation navigation.launch.py map_file:=/path/to/map.yaml
 >
 > You can also use launch parameters to configure the map height.
 
+---
+
+## 9. **[OPTIONAL]** Drilling
+
+Now the robot can be sent to the drilling position via the navigation pipeline above.<br>
+After that, using the ROS1 drilling plugin, the drilling can be performed via the Xbot2 GUI in the tablet.
 
