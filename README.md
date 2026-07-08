@@ -4,6 +4,9 @@ To keep the systems separated, the **CONCERT onboard sub-network** uses `ROS_DOM
 
 This setup is required because automatic discovery range do not work reliably.
 
+> [!NOTE]
+> **Full demo order:** this README covers the **ROS2** navigation pipeline. The demo can also have a **ROS1** control/drilling part, documented separately in [`DRILLING_DEMO.md`](DRILLING_DEMO.md). See Section 5 below for exactly when to switch over — in short, control bringup (ROS1) must run *before* the rest of this navigation pipeline, and the actual drilling only happens once the robot has arrived at its target via navigation.
+
 ---
 
 ## 1. Preliminaries
@@ -26,12 +29,12 @@ This setup is required because automatic discovery range do not work reliably.
 
 ## 2. Embedded PC — XBot2 and EtherCAT
 
-On the **Embedded PC**:
+On the **Embedded PC** (appears as `mio-concert` in the terminal):
 
 * IP address: `10.24.10.100`
-* Access command: `ssh_embedded`
+* Access command: `ssh_embedded` (from pilot)
 
-Open **three separate terminals** and run the following commands.
+Open **three separate terminals** and  after having turned on CONCERT, wait 5 seconds before running these commands:
 
 ### Terminal 1 — Start EtherCAT Master
 
@@ -39,12 +42,16 @@ Open **three separate terminals** and run the following commands.
 repl -f /home/user/data/forest_ws/src/concert_config/ecat/ecat_config.yaml
 ```
 
+You should see that the master tries to connect to at least 20 slaves.
+
 ### Terminal 2 — Start XBot2 Core
+
+When the previous script has arrived at the output "_started looping_", then wait a few seconds and run
 
 ```bash
 xbot2-core --hw ec_imp -C /home/user/data/forest_ws/src/concert_config/ModularBot.yaml
 ```
-
+You should hear the brakes th
 ### Terminal 3 — Start XBot2 GUI Server
 
 This enables the XBot2 connection from the tablet.
@@ -67,8 +74,10 @@ Port: 8080
 On the **Control PC**:
 
 * IP address: `10.24.10.102`
+* Access command: `ssh_control` (from pilot)
 
 Open **two separate terminals** and run the following commands to bring up the IMU and rear VLP LiDAR.
+
 
 ### Terminal 1 — Start IMU / VectorNav
 
@@ -86,7 +95,13 @@ ros2 launch concert_config velodyne-VLP16_back.launch.py
 
 ## 4. Vision PC
 
-On the **Vision PC** (ip 10.24.10.101), launch the front VLP LiDAR and the Zenoh DDS bridge.
+On the **Vision PC**:
+
+* IP address: `10.24.10.101`
+* Access command: `ssh_control` (from pilot)
+
+Open **two separate terminals** and launch the front VLP LiDAR and the Zenoh DDS bridge.
+
 
 ### Terminal 1 — Front Velodyne VLP-16 LiDAR
 
@@ -171,3 +186,9 @@ ros2 launch concert_navigation navigation.launch.py map_file:=/path/to/map.yaml
 > This will generate a folder containing the converted `.pgm` and `.yaml` map files.
 >
 > You can also use launch parameters to configure the map height.
+
+---
+
+## 9. **[OPTIONAL]** Drilling — Switch back to ROS1
+
+Once the robot has arrived at the drilling point via the navigation pipeline above, go back to **[`DRILLING_DEMO.md`](DRILLING_DEMO.md)** and run the drilling operation from ROS1, using the `ros1_bridge` to reach the CONCERT ROS2 topics.
