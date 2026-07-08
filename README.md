@@ -4,8 +4,9 @@ To keep the systems separated, the **CONCERT onboard sub-network** uses `ROS_DOM
 
 This setup is required because automatic discovery range do not work reliably.
 
-> [!NOTE]
-> **Full demo order:** this README covers the **ROS2** navigation pipeline. The demo can also have a **ROS1** drilling part, documented separately in [`DRILLING_DEMO.md`](DRILLING_DEMO.md). See [below](#9-optional-drilling--switch-back-to-ros1) for exactly when to switch over — in short, control bringup (ROS1) must run *before* the rest of this navigation pipeline, and the actual drilling only happens once the robot has arrived at its target via navigation.
+> [!CAUTION]
+> **Full demo order:** this README covers the **ROS2** navigation pipeline. The demo can also have a **ROS1** drilling part, documented separately in [`DRILLING_DEMO.md`](DRILLING_DEMO.md). Those operation **MUST** be performed before starting the navigation stack.
+
 
 ---
 
@@ -187,8 +188,4 @@ ros2 launch concert_navigation navigation.launch.py map_file:=/path/to/map.yaml
 >
 > You can also use launch parameters to configure the map height.
 
----
 
-## 9. **[OPTIONAL]** Drilling — Switch back to ROS1
-
-Once the robot has arrived at the drilling point via the navigation pipeline above, go back to **[`DRILLING_DEMO.md`](DRILLING_DEMO.md)** and run the drilling operation from ROS1, using the `ros1_bridge` to reach the CONCERT ROS2 topics.
