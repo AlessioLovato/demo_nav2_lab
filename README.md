@@ -5,7 +5,7 @@ To keep the systems separated, the **CONCERT onboard sub-network** uses `ROS_DOM
 This setup is required because automatic discovery range do not work reliably.
 
 > [!NOTE]
-> **Full demo order:** this README covers the **ROS2** navigation pipeline. The demo can also have a **ROS1** control/drilling part, documented separately in [`DRILLING_DEMO.md`](DRILLING_DEMO.md). See Section 5 below for exactly when to switch over — in short, control bringup (ROS1) must run *before* the rest of this navigation pipeline, and the actual drilling only happens once the robot has arrived at its target via navigation.
+> **Full demo order:** this README covers the **ROS2** navigation pipeline. The demo can also have a **ROS1** drilling part, documented separately in [`DRILLING_DEMO.md`](DRILLING_DEMO.md). See [below](#9-optional-drilling--switch-back-to-ros1) for exactly when to switch over — in short, control bringup (ROS1) must run *before* the rest of this navigation pipeline, and the actual drilling only happens once the robot has arrived at its target via navigation.
 
 ---
 
