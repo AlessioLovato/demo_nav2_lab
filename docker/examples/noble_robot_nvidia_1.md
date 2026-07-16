@@ -149,6 +149,13 @@ sudo apt install -y \
     ros-jazzy-random-numbers 
 ```
 
+> [!IMPORTANT]
+> If you want to use the **zenoh bridge** install the following package.
+
+```bash
+sudo apt install zenoh-bridge-ros2dds
+```
+
 The RTAB-Map packages should normally be installed later through the Forest recipes. If they are missing, install them manually:
 
 ```bash
