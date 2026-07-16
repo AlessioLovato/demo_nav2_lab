@@ -1,51 +1,192 @@
-# Building standard docker in CONCERT
-# (Using Xbot2_docker)
+# Standard Docker Setup for CONCERT
 
-This guide is meant to have a standardize building of the dockers for concerta cross all its machine (embedded, control and vision).
-We will provide default instruction, whereas more costum installation can be done after the creation of the docker.
-Please don't mess with dockers of others :)
+This guide describes the recommended procedure for creating and managing Docker containers across the CONCERT machines:
+
+* Embedded
+* Control
+* Vision
+
+The containers are based on the `xbot2_docker` repository.
+
+The goal is to keep the setup consistent across all machines while still allowing host-specific customization after container creation.
+
+> [!IMPORTANT]
+> Do not modify, stop, or remove containers belonging to other users unless previously agreed.
+
+## Requirements
+
+This guide assumes:
+
+* Ubuntu 24.04 Noble
+* ROS 2 Jazzy
+* Docker Engine
+* Docker Compose
+* NVIDIA Container Toolkit when GPU access is required
 
 ## Getting started
-We use Xbot2_docker as base generation, with some sanity checks. Please refer to that pacage for extensive explaining.
 
-## Creating the docker
-clone the repo and enter the correct direcotry. We assume Ubuntu 24.04 and ROS2 Jazzy.
+Clone the `xbot2_docker` repository and enter the Noble configuration directory:
+
 ```bash
-git clone <repo>
+git clone <repository-url>
 cd xbot2_docker/noble
 ```
-> [!WARNING]
-> If you need to attach some external devices to the host machine and let them be read by the host (i.e. **realsense**), probably you'll need to add the volume `/dev:/dev:r` in the correct service inside compose.yaml
 
-Now create the docker.
->[!CAUTION]
-> If you will use the GPU of the host machine (NVIDIA), you'll need to build the **`robot-nvidia`** service, with `robot` otherwise.
+Refer to the upstream `xbot2_docker` documentation for a complete explanation of the available services, images, and configuration options.
+
+## Choosing the service
+
+Use the appropriate Docker Compose service depending on the required hardware support.
+
+| Requirement            | Service        |
+| ---------------------- | -------------- |
+| Standard CPU container | `robot`        |
+| NVIDIA GPU access      | `robot-nvidia` |
+
+> [!CAUTION]
+> When GPU access is required, use the `robot-nvidia` service and ensure that the NVIDIA Container Toolkit is correctly installed on the host.
+
+## Accessing host devices
+
+When the container must access devices connected to the host, such as a RealSense camera, expose the required device paths in `compose.yaml`.
+
+For example:
+
+```yaml
+services:
+  robot-nvidia:
+    volumes:
+      - /dev:/dev
+```
+
+A more restrictive mapping should be preferred when the exact device is known:
+
+```yaml
+services:
+  robot-nvidia:
+    devices:
+      - /dev/video0:/dev/video0
+```
+
+The exact device path depends on the hardware and driver configuration.
+
+## Creating a container
+
+First, update the base image:
 
 ```bash
-# Update the image
-docker compose pull <service_name>
-#Bring up the container
-docker compose -p <name> up -d robot-nvidia
+docker compose pull <service-name>
+```
+
+Then create the container using a unique Compose project name:
+
+```bash
+docker compose -p <project-name> up -d <service-name>
+```
+
+Example:
+
+```bash
+docker compose -p test up -d robot-nvidia
+```
+
+Docker Compose combines the project name, service name, and replica index to generate the container name.
+
+For example:
+
+```text
+Project name: test
+Service name: robot-nvidia
+Container name: test-robot-nvidia-1
+```
+
+Using a project name is important because it allows multiple containers to be created from the same Compose service without conflicts.
+
+## Entering the container
+
+From the directory containing `compose.yaml`:
+
+```bash
+docker compose -p <project-name> exec <service-name> bash
+```
+
+Example:
+
+```bash
+docker compose -p test exec robot-nvidia bash
+```
+
+From any directory, using the generated container name:
+
+```bash
+docker exec -it <container-name> bash
+```
+
+Example:
+
+```bash
+docker exec -it test-robot-nvidia-1 bash
 ```
 
 > [!NOTE]
-> Notice that previously we associated the docker container a name. We can use that name to identify it by "tabbing" after a -p flag in docker.
-> Also that nome will be "composed with the service name to form the docker container's name.
-> *For instance the name "test" used with the service "robot-nvidia" will generate the container named "test-robot-nvidia-1".*
+> Shell completion may suggest available project names, services, and container names when pressing `Tab`.
 
-Now you docker is ready and to enter the container from a terminal you can use from inside the current folder:
+## Stopping a container
+
+To stop a Compose project without removing its container:
+
 ```bash
-docker compose exec -p <name> exec <service_name> bash
+docker compose -p <project-name> stop
 ```
-or from wherever in the machine with:
+
+To stop and remove only that Compose project:
+
 ```bash
-docker exec -it <container_name> exec bash
+docker compose -p <project-name> down
 ```
-> [!NOTE]
-> After -p and -it flag you can just tab to see the available options
 
-## Inside the container
-Inside the container basically you can do whatever you want. For the sake of clarity, we should keep track of the important container created in each machine in this file [link to file]. Adding also a small description of what the container uses or the intent might be good.<br>
+Example:
 
-### Some example
-In the folder examples you'll find two readme with the commands to create a basic docker for each CONCERT on board host (assuming all the recipes of forest are up-to date).
+```bash
+docker compose -p test down
+```
+
+This does not affect containers created using other project names, even when they use the same service.
+
+## Container documentation
+
+All relevant containers should be recorded in:
+
+```text
+DOCKER_LOG.md
+```
+
+For each container, document at least:
+
+* Host machine
+* Container name
+* Compose project name
+* Compose directory
+* Creation date
+* Current status
+* Purpose
+* Creator
+* Known limitations
+
+Host-specific installation and configuration instructions should be stored in:
+
+```text
+examples/
+```
+
+## Examples
+
+The `examples` directory contains setup notes for specific CONCERT containers.
+
+Current example:
+
+```text
+examples/vision_defection_robot_nvidia_1.md
+```
+
+These instructions assume that the required Forest recipes and repositories are available and up to date.
