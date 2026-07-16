@@ -28,7 +28,7 @@ This guide assumes:
 Clone the `xbot2_docker` repository and enter the Noble configuration directory:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ADVRHumanoids/xbot2_docker.git
 cd xbot2_docker/noble
 ```
 
